@@ -1,0 +1,2 @@
+0 brain tumour
+1 healthy
