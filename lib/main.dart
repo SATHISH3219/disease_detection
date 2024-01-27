@@ -16,7 +16,8 @@ class MyApp extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Flutter Demo',
+      title: 'Disease Detection',
+      debugShowCheckedModeBanner: false,
       theme: ThemeData(
         colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
         useMaterial3: true,
@@ -134,32 +135,50 @@ class _MyHomePageState extends State<MyHomePage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Disease Detection"),
+        backgroundColor: Colors.blue,
+        shadowColor: Colors.black,
+        shape: const RoundedRectangleBorder(
+          borderRadius: BorderRadius.only(
+              bottomRight: Radius.circular(30),
+              bottomLeft: Radius.circular(30)),
+        ),
+        title: const Center(
+          child: Text(
+            "Disease Detection",
+            style: TextStyle(
+              color: Colors.black,
+              fontSize: 30,
+              fontStyle: FontStyle.normal,
+              fontWeight: FontWeight.w700,
+            ),
+          ),
+        ),
       ),
       body: SingleChildScrollView(
         child: Center(
           child: Column(
             children: [
               const SizedBox(
-                height: 12,
+                height: 40,
               ),
               Card(
-                elevation: 20,
+                elevation: 35,
+                color: Colors.white,
                 clipBehavior: Clip.hardEdge,
                 child: SizedBox(
-                  width: 300,
+                  width: 350,
                   child: SingleChildScrollView(
                     child: Column(
                       children: [
                         const SizedBox(
-                          height: 18,
+                          height: 35,
                         ),
                         Container(
-                          height: 280,
+                          height: 290,
                           width: 280,
                           decoration: BoxDecoration(
-                            color: Colors.white,
-                            borderRadius: BorderRadius.circular(12),
+                            color: Color.fromARGB(255, 255, 255, 255),
+                            borderRadius: BorderRadius.circular(30),
                             image: const DecorationImage(
                               image: AssetImage('assets/upload.jpg'),
                             ),
@@ -191,8 +210,7 @@ class _MyHomePageState extends State<MyHomePage> {
                               Text(
                                 "The Accuracy is ${confidence.toStringAsFixed(0)}%",
                                 style: const TextStyle(
-                                  fontSize: 18,
-                                ),
+                                    fontSize: 22, fontWeight: FontWeight.w500),
                               ),
                               const SizedBox(
                                 height: 12,
@@ -206,7 +224,7 @@ class _MyHomePageState extends State<MyHomePage> {
                 ),
               ),
               const SizedBox(
-                height: 8,
+                height: 15,
               ),
               ElevatedButton(
                 onPressed: () {
@@ -214,7 +232,8 @@ class _MyHomePageState extends State<MyHomePage> {
                 },
                 style: ElevatedButton.styleFrom(
                     padding: const EdgeInsets.symmetric(
-                        horizontal: 30, vertical: 10),
+                        horizontal: 65, vertical: 20),
+                    elevation: 10,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(13),
                     ),
@@ -232,13 +251,15 @@ class _MyHomePageState extends State<MyHomePage> {
                 },
                 style: ElevatedButton.styleFrom(
                     padding: const EdgeInsets.symmetric(
-                        horizontal: 30, vertical: 10),
+                        horizontal: 45, vertical: 20),
+                    elevation: 10,
                     shape: RoundedRectangleBorder(
                       borderRadius: BorderRadius.circular(13),
                     ),
                     foregroundColor: Colors.black),
                 child: const Text(
-                  "Pick from gallery",
+                  "Select from gallery",
+                  selectionColor: Colors.blue,
                 ),
               ),
             ],
