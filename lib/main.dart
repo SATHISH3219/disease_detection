@@ -1,135 +1,48 @@
-import 'dart:developer' as devtools;
-import 'dart:io';
-
+import 'package:disease_detection/Brain_Tumor/brain_tumor.dart';
+import 'package:disease_detection/TuberClosis/tuber_closis.dart';
 import 'package:flutter/material.dart';
-import 'package:flutter_tflite/flutter_tflite.dart';
-import 'package:image_picker/image_picker.dart';
 
 void main() {
-  runApp(const MyApp());
+  runApp(MyApp());
 }
 
 class MyApp extends StatelessWidget {
-  const MyApp({super.key});
-
-  // This widget is the root of your application.
   @override
   Widget build(BuildContext context) {
     return MaterialApp(
-      title: 'Disease Detection',
       debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-        useMaterial3: true,
-      ),
-      home: const MyHomePage(),
+      home: MainScreen(),
     );
   }
 }
 
-class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key});
-
+class MainScreen extends StatefulWidget {
   @override
-  State<MyHomePage> createState() => _MyHomePageState();
+  _MainScreenState createState() => _MainScreenState();
 }
 
-class _MyHomePageState extends State<MyHomePage> {
-  File? filePath;
-  String label = '';
-  double confidence = 0.0;
-
-  Future<void> _tfLteInit() async {
-    String? res = await Tflite.loadModel(
-        model: "assets/model_unquant.tflite",
-        labels: "assets/labels.txt",
-        numThreads: 1, // defaults to 1
-        isAsset:
-            true, // defaults to true, set to false to load resources outside assets
-        useGpuDelegate:
-            false // defaults to false, set to true to use GPU delegate
-        );
+class _MainScreenState extends State<MainScreen> {
+  int inde = 0;
+  void indes() {
+    Navigator.pushReplacement(
+        context, MaterialPageRoute(builder: (context) => MyApp()));
   }
 
-  pickImageGallery() async {
-    final ImagePicker picker = ImagePicker();
-// Pick an image.
-    final XFile? image = await picker.pickImage(source: ImageSource.gallery);
+  // List of image paths
+  final List<String> imagePaths = [
+    "assets/braintumor.png",
+    "assets/tuberclosis.jpeg",
+    "assets/upload.jpg",
+    "assets/upload.jpg",
+  ];
 
-    if (image == null) return;
-
-    var imageMap = File(image.path);
-
-    setState(() {
-      filePath = imageMap;
-    });
-
-    var recognitions = await Tflite.runModelOnImage(
-        path: image.path, // required
-        imageMean: 0.0, // defaults to 117.0
-        imageStd: 255.0, // defaults to 1.0
-        numResults: 2, // defaults to 5
-        threshold: 0.2, // defaults to 0.1
-        asynch: true // defaults to true
-        );
-
-    if (recognitions == null) {
-      devtools.log("recognitions is Null");
-      return;
-    }
-    devtools.log(recognitions.toString());
-    setState(() {
-      confidence = (recognitions[0]['confidence'] * 100);
-      label = recognitions[0]['label'].toString();
-    });
-  }
-
-  pickImageCamera() async {
-    final ImagePicker picker = ImagePicker();
-// Pick an image.
-    final XFile? image = await picker.pickImage(source: ImageSource.camera);
-
-    if (image == null) return;
-
-    var imageMap = File(image.path);
-
-    setState(() {
-      filePath = imageMap;
-    });
-
-    var recognitions = await Tflite.runModelOnImage(
-        path: image.path, // required
-        imageMean: 0.0, // defaults to 117.0
-        imageStd: 255.0, // defaults to 1.0
-        numResults: 2, // defaults to 5
-        threshold: 0.2, // defaults to 0.1
-        asynch: true // defaults to true
-        );
-
-    if (recognitions == null) {
-      devtools.log("recognitions is Null");
-      return;
-    }
-    devtools.log(recognitions.toString());
-    setState(() {
-      confidence = (recognitions[0]['confidence'] * 100);
-      label = recognitions[0]['label'].toString();
-    });
-  }
-
-  @override
-  void dispose() {
-    // TODO: implement dispose
-    super.dispose();
-    Tflite.close();
-  }
-
-  @override
-  void initState() {
-    // TODO: implement initState
-    super.initState();
-    _tfLteInit();
-  }
+  // List of text for each grid item
+  final List<String> itemTexts = [
+    'Brain Tumor',
+    'Tuber Closis',
+    'Item 2',
+    'Item 3',
+  ];
 
   @override
   Widget build(BuildContext context) {
@@ -139,8 +52,9 @@ class _MyHomePageState extends State<MyHomePage> {
         shadowColor: Colors.black,
         shape: const RoundedRectangleBorder(
           borderRadius: BorderRadius.only(
-              bottomRight: Radius.circular(30),
-              bottomLeft: Radius.circular(30)),
+            bottomRight: Radius.circular(30),
+            bottomLeft: Radius.circular(30),
+          ),
         ),
         title: const Center(
           child: Text(
@@ -155,117 +69,108 @@ class _MyHomePageState extends State<MyHomePage> {
         ),
       ),
       body: SingleChildScrollView(
-        child: Center(
-          child: Column(
-            children: [
-              const SizedBox(
-                height: 40,
-              ),
-              Card(
-                elevation: 35,
-                color: Colors.white,
-                clipBehavior: Clip.hardEdge,
-                child: SizedBox(
-                  width: 350,
-                  child: SingleChildScrollView(
-                    child: Column(
-                      children: [
-                        const SizedBox(
-                          height: 35,
-                        ),
-                        Container(
-                          height: 290,
-                          width: 280,
-                          decoration: BoxDecoration(
-                            color: Color.fromARGB(255, 255, 255, 255),
-                            borderRadius: BorderRadius.circular(30),
-                            image: const DecorationImage(
-                              image: AssetImage('assets/upload.jpg'),
-                            ),
-                          ),
-                          child: filePath == null
-                              ? const Text('')
-                              : Image.file(
-                                  filePath!,
-                                  fit: BoxFit.fill,
-                                ),
-                        ),
-                        const SizedBox(
-                          height: 12,
-                        ),
-                        Padding(
-                          padding: const EdgeInsets.all(8.0),
-                          child: Column(
-                            children: [
-                              Text(
-                                label,
-                                style: const TextStyle(
-                                  fontSize: 18,
-                                  fontWeight: FontWeight.bold,
-                                ),
-                              ),
-                              const SizedBox(
-                                height: 12,
-                              ),
-                              Text(
-                                "The Accuracy is ${confidence.toStringAsFixed(0)}%",
-                                style: const TextStyle(
-                                    fontSize: 22, fontWeight: FontWeight.w500),
-                              ),
-                              const SizedBox(
-                                height: 12,
-                              ),
-                            ],
-                          ),
-                        ),
-                      ],
-                    ),
-                  ),
-                ),
-              ),
-              const SizedBox(
-                height: 15,
-              ),
-              ElevatedButton(
-                onPressed: () {
-                  pickImageCamera();
-                },
-                style: ElevatedButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 65, vertical: 20),
-                    elevation: 10,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(13),
-                    ),
-                    foregroundColor: Colors.black),
-                child: const Text(
-                  "Take a Photo",
-                ),
-              ),
-              const SizedBox(
-                height: 8,
-              ),
-              ElevatedButton(
-                onPressed: () {
-                  pickImageGallery();
-                },
-                style: ElevatedButton.styleFrom(
-                    padding: const EdgeInsets.symmetric(
-                        horizontal: 45, vertical: 20),
-                    elevation: 10,
-                    shape: RoundedRectangleBorder(
-                      borderRadius: BorderRadius.circular(13),
-                    ),
-                    foregroundColor: Colors.black),
-                child: const Text(
-                  "Select from gallery",
-                  selectionColor: Colors.blue,
-                ),
-              ),
-            ],
-          ),
+        child: Column(
+          children: [
+            const SizedBox(
+              height: 30,
+            ),
+            Padding(
+              padding: const EdgeInsets.all(15.0),
+              child: buildScrollableGridView(context),
+            ),
+          ],
         ),
       ),
+      bottomNavigationBar: BottomNavigationBar(
+        currentIndex: inde,
+        onTap: (int Index) {
+          inde = Index;
+          setState(() {
+            if (inde == 0) {
+              indes();
+            }
+          });
+        },
+        items: const [
+          BottomNavigationBarItem(icon: Icon(Icons.home), label: "Home"),
+          BottomNavigationBarItem(
+              icon: Icon(Icons.medical_information), label: "Medicine"),
+          BottomNavigationBarItem(icon: Icon(Icons.settings), label: "Setting"),
+        ],
+        backgroundColor: Colors.blue,
+        selectedFontSize: 15,
+        selectedItemColor: Colors.black,
+      ),
     );
+  }
+
+  Widget buildScrollableGridView(BuildContext context) {
+    return GridView.builder(
+      shrinkWrap: true,
+      physics: const NeverScrollableScrollPhysics(),
+      gridDelegate: const SliverGridDelegateWithFixedCrossAxisCount(
+        crossAxisCount: 2,
+        crossAxisSpacing: 8.0,
+        mainAxisSpacing: 8.0,
+      ),
+      itemCount: 4,
+      itemBuilder: (BuildContext context, int index) {
+        return InkWell(
+          onTap: () {
+            navigateToPage(context, index);
+          },
+          child: Container(
+            decoration: BoxDecoration(
+                color: const Color.fromARGB(255, 255, 255, 255),
+                borderRadius: BorderRadius.circular(20),
+                boxShadow: [
+                  BoxShadow(
+                      color: Colors.black, spreadRadius: 0, blurRadius: 4),
+                ]),
+            child: Padding(
+              padding: const EdgeInsets.all(20.0),
+              child: Column(
+                children: [
+                  Center(
+                    child: Image.asset(
+                      imagePaths[index],
+                      width: 80.0,
+                      height: 80.0,
+                    ),
+                  ),
+                  Padding(
+                    padding: const EdgeInsets.all(16.0),
+                    child: Text(itemTexts[index]),
+                  )
+                ],
+              ),
+            ),
+          ),
+        );
+      },
+    );
+  }
+
+  void navigateToPage(BuildContext context, int index) {
+    switch (index) {
+      case 0:
+        Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (context) => BrainTumor(
+                      itemText: '',
+                    )));
+        break;
+      case 1:
+        Navigator.push(
+            context,
+            MaterialPageRoute(
+                builder: (context) => TuberClosis(
+                      itemText: '',
+                    )));
+        break;
+      default:
+        break;
+    }
   }
 }
